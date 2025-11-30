@@ -51,26 +51,28 @@ void input_update(f64 delta_time) {
 }
 
 void input_process_key(keys key, b8 pressed) {
+	// Only handle this if the state actually changed
+	if (state_ptr && state_ptr->keyboard_current.keys[key] != pressed) {
+
 	if (key == KEY_LALT) {
-        KINFO("Left alt pressed.");
+        KINFO("Left alt %s.", pressed ? "pressed" : "released");
     } else if (key == KEY_RALT) {
-        KINFO("Right alt pressed.");
+        KINFO("Right alt %s.", pressed ? "pressed" : "released");
     }
 
     if (key == KEY_LCONTROL) {
-        KINFO("Left ctrl pressed.");
+        KINFO("Left ctrl %s.", pressed ? "pressed" : "released");
     } else if (key == KEY_RCONTROL) {
-        KINFO("Right ctrl pressed.");
+        KINFO("Right ctrl %s.", pressed ? "pressed" : "released");
     }
 
     if (key == KEY_LSHIFT) {
-        KINFO("Left shift pressed.");
+        KINFO("Left shift %s.", pressed ? "pressed" : "released");
     } else if (key == KEY_RSHIFT) {
-        KINFO("Right shift pressed.");
+        KINFO("Right shift %s.", pressed ? "pressed" : "released");
     }
 
-	// Only handle this if the state actually changed
-	if (state_ptr->keyboard_current.keys[key] != pressed) {
+	
 		// Update the current state
 		state_ptr->keyboard_current.keys[key] = pressed;
 

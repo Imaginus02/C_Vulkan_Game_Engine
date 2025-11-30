@@ -1,0 +1,60 @@
+#pragma once
+
+#include "defines.h"
+
+typedef union vec2_u {
+	// An array of x, y
+	f32 elements[2];
+	struct {
+		union {
+			// the first element
+			f32 x, r, s, u;
+		};
+		union {
+			f32 y, g, t, v;
+		};
+	};
+} vec2;
+
+typedef union vec3_u {
+	// An array of x, y, z
+	f32 elements[3];
+	struct {
+		union {
+			// the first element
+			f32 x, r, s, u;
+		};
+		union {
+			f32 y, g, t, v;
+		};
+		union {
+			f32 z, b, p, w;
+		};
+	};
+} vec3;
+
+typedef union vec4_u {
+	// An array of x, y, z, w
+	f32 elements[4];
+	struct {
+		union {
+			// the first element
+			f32 x, r, s;
+		};
+		union {
+			f32 y, g, t;
+		};
+		union {
+			f32 z, b, p;
+		};
+		union {
+			f32 w, a, q;
+		};
+	};
+} vec4;
+
+typedef vec4 quat;
+
+typedef union mat4_u {
+    f32 data[16];
+} mat4;

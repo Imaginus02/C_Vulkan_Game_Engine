@@ -3,18 +3,17 @@
 #include "defines.h"
 
 typedef enum renderer_backend_type {
-	RENDERER_BACKEND_VULKAN,
-	RENDERER_BACKEND_OPENGL,
-	RENDERER_BACKEND_DIRECTX,
-	RENDERER_BACKEND_MAX_BACKENDS
+	RENDERER_BACKEND_TYPE_VULKAN,
+	RENDERER_BACKEND_TYPE_OPENGL,
+	RENDERER_BACKEND_TYPE_DIRECTX,
+	RENDERER_BACKEND_TYPE_MAX_BACKENDS
 } renderer_backend_type;
 
 typedef struct renderer_backend {
-	struct platform_state* plat_state;
 
 	u64 frame_number;
 
-	b8 (*initialize)(struct renderer_backend* backend, const char* application_name, struct platform_state* plat_state);
+	b8 (*initialize)(struct renderer_backend* backend, const char* application_name);
 
 	void (*shutdown)(struct renderer_backend* backend);
 

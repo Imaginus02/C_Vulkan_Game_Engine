@@ -20,6 +20,9 @@
         "logger.h": "c",
         "renderer_types.inl": "c",
         "sstream": "c",
-        "game_types.h": "c"
+        "game_types.h": "c",
+        "vulkan_backend.h": "c",
+        "renderer_backend.h": "c",
+        "math_types.h": "c"
     }
 }

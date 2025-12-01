@@ -18,6 +18,8 @@
         "clock.h": "c",
         "kstring.h": "c",
         "logger.h": "c",
-        "renderer_types.inl": "c"
+        "renderer_types.inl": "c",
+        "sstream": "c",
+        "game_types.h": "c"
     }
 }

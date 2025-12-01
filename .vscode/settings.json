@@ -4,6 +4,10 @@
 		"platform.h": "c",
 		"renderer_backend.h": "c",
 		"logger.h": "c",
-		"renderer_types.inl": "c"
+		"renderer_types.inl": "c",
+		"vulkan_types.inl": "c",
+		"format": "c",
+		"stat.h": "c",
+		"application.h": "c"
 	}
 }

@@ -1,13 +1,22 @@
 {
 	"files.associations": {
-		"windowsx.h": "c",
-		"platform.h": "c",
-		"renderer_backend.h": "c",
-		"logger.h": "c",
-		"renderer_types.inl": "c",
-		"vulkan_types.inl": "c",
-		"format": "c",
-		"stat.h": "c",
-		"application.h": "c"
-	}
+        "test.h": "c",
+        "vulkan.h": "c",
+        "vulkan_core.h": "c",
+        "vk_platform.h": "c",
+        "type_traits": "c",
+        "typeinfo": "c",
+        "windowsx.h": "c",
+        "vulkan_platform.h": "c",
+        "renderer_frontend.h": "c",
+        "iosfwd": "c",
+        "tuple": "cpp",
+        "utility": "cpp",
+        "kmemory.h": "c",
+        "defines.h": "c",
+        "vulkan_types.inl": "c",
+        "clock.h": "c",
+        "kstring.h": "c",
+        "logger.h": "c"
+    }
 }

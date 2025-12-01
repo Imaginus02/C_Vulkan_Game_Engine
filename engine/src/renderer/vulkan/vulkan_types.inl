@@ -125,47 +125,56 @@ typedef struct vulkan_object_shader {
 } vulkan_object_shader;
 
 typedef struct vulkan_context {
-	u32 framebuffer_width;
-	u32 framebuffer_height;
 
-	u64 framebuffer_size_generation;
+    // The framebuffer's current width.
+    u32 framebuffer_width;
 
-	u64 framebuffer_size_last_generation;
+    // The framebuffer's current height.
+    u32 framebuffer_height;
 
-	VkInstance instance;
-	VkAllocationCallbacks* allocator;
-	VkSurfaceKHR surface;
+    // Current generation of framebuffer size. If it does not match framebuffer_size_last_generation,
+    // a new one should be generated.
+    u64 framebuffer_size_generation;
+
+    // The generation of the framebuffer when it was last created. Set to framebuffer_size_generation
+    // when updated.
+    u64 framebuffer_size_last_generation;
+
+    VkInstance instance;
+    VkAllocationCallbacks* allocator;
+    VkSurfaceKHR surface;
 
 #if defined(_DEBUG)
-	VkDebugUtilsMessengerEXT debug_messenger;
+    VkDebugUtilsMessengerEXT debug_messenger;
 #endif
 
-	vulkan_device device;
+    vulkan_device device;
 
-	vulkan_swapchain swapchain;
-	vulkan_renderpass main_renderpass;
+    vulkan_swapchain swapchain;
+    vulkan_renderpass main_renderpass;
 
-	// darray
-	vulkan_command_buffer* graphics_command_buffers;
+    // darray
+    vulkan_command_buffer* graphics_command_buffers;
 
-	//darray
-	VkSemaphore* image_available_semaphores;
+    // darray
+    VkSemaphore* image_available_semaphores;
 
-	//darray
-	VkSemaphore* queue_complete_semaphores;
+    // darray
+    VkSemaphore* queue_complete_semaphores;
 
-	u32 in_flight_fence_count;
-	vulkan_fence* in_flight_fences;
+    u32 in_flight_fence_count;
+    vulkan_fence* in_flight_fences;
 
-	// Holds pointers to fences which exist and are owned elsewhere
-	vulkan_fence** images_in_flight;
+    // Holds pointers to fences which exist and are owned elsewhere.
+    vulkan_fence** images_in_flight;
 
-	u32 image_index;
-	u32 current_frame;
+    u32 image_index;
+    u32 current_frame;
 
-	b8 recreating_swapchain;
+    b8 recreating_swapchain;
 
-	vulkan_object_shader object_shader;
+    vulkan_object_shader object_shader;
 
-	i32 (*find_memory_index)(u32 type_filter, u32 property_flags);
+    i32 (*find_memory_index)(u32 type_filter, u32 property_flags);
+
 } vulkan_context;

@@ -6,23 +6,23 @@
 #include "core/logger.h"
 
 void vulkan_image_create(
-	vulkan_context* context,
-	VkImageType image_type,
-	u32 width,
-	u32 height,
-	VkFormat format,
-	VkImageTiling tiling,
-	VkImageUsageFlags usage,
-	VkMemoryPropertyFlags memory_flags,
-	b32 create_view,
-	VkImageAspectFlags view_aspect_flags,
-	vulkan_image* out_image) {
+    vulkan_context* context,
+    VkImageType image_type,
+    u32 width,
+    u32 height,
+    VkFormat format,
+    VkImageTiling tiling,
+    VkImageUsageFlags usage,
+    VkMemoryPropertyFlags memory_flags,
+    b32 create_view,
+    VkImageAspectFlags view_aspect_flags,
+    vulkan_image* out_image) {
 
-	out_image->width = width;
-	out_image->height = height;
+    out_image->width = width;
+    out_image->height = height;
 
-	// Creation info
-	VkImageCreateInfo image_create_info = {VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
+    // Creation info
+    VkImageCreateInfo image_create_info = {VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
     image_create_info.imageType = VK_IMAGE_TYPE_2D;
     image_create_info.extent.width = width;
     image_create_info.extent.height = height;
@@ -36,30 +36,30 @@ void vulkan_image_create(
     image_create_info.samples = VK_SAMPLE_COUNT_1_BIT;          // TODO: Configurable sample count.
     image_create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;  // TODO: Configurable sharing mode.
 
-	VK_CHECK(vkCreateImage(context->device.logical_device, &image_create_info, context->allocator, &out_image->handle));
+    VK_CHECK(vkCreateImage(context->device.logical_device, &image_create_info, context->allocator, &out_image->handle));
 
-	// Memory
-	VkMemoryRequirements memory_requirements;
-	vkGetImageMemoryRequirements(context->device.logical_device, out_image->handle, &memory_requirements);
+    // Memory
+    VkMemoryRequirements memory_requirements;
+    vkGetImageMemoryRequirements(context->device.logical_device, out_image->handle, &memory_requirements);
 
-	i32 memory_type = context->find_memory_index(memory_requirements.memoryTypeBits, memory_flags);
-	if (memory_type == -1) {
-		KERROR("Failed to find suitable memory type for image!");
-	}
+    i32 memory_type = context->find_memory_index(memory_requirements.memoryTypeBits, memory_flags);
+    if (memory_type == -1) {
+        KERROR("Failed to find suitable memory type for image!");
+    }
 
-	// Allocate memory
-	VkMemoryAllocateInfo memory_allocate_info = {VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
-	memory_allocate_info.allocationSize = memory_requirements.size;
-	memory_allocate_info.memoryTypeIndex = memory_type;
-	VK_CHECK(vkAllocateMemory(context->device.logical_device, &memory_allocate_info, context->allocator, &out_image->memory));
+    // Allocate memory
+    VkMemoryAllocateInfo memory_allocate_info = {VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
+    memory_allocate_info.allocationSize = memory_requirements.size;
+    memory_allocate_info.memoryTypeIndex = memory_type;
+    VK_CHECK(vkAllocateMemory(context->device.logical_device, &memory_allocate_info, context->allocator, &out_image->memory));
 
-	// Bind memory
-	VK_CHECK(vkBindImageMemory(context->device.logical_device, out_image->handle, out_image->memory, 0)); // TODO: Configurable memory offset
+    // Bind memory
+    VK_CHECK(vkBindImageMemory(context->device.logical_device, out_image->handle, out_image->memory, 0)); // TODO: Configurable memory offset
 
-	if (create_view) {
-		out_image->view = 0;
-		vulkan_image_view_create(context, format, out_image, view_aspect_flags);
-	}
+    if (create_view) {
+        out_image->view = 0;
+        vulkan_image_view_create(context, format, out_image, view_aspect_flags);
+    }
 }
 
 void vulkan_image_view_create(

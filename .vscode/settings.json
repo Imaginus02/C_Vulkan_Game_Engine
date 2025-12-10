@@ -23,6 +23,7 @@
         "game_types.h": "c",
         "vulkan_backend.h": "c",
         "renderer_backend.h": "c",
-        "math_types.h": "c"
+        "math_types.h": "c",
+        "vulkan_shader_utils.h": "c"
     }
 }

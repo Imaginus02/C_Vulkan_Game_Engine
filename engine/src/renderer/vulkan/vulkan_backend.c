@@ -28,8 +28,8 @@
 
 // static Vulkan context;
 static vulkan_context context;
-static u32 cached_framebuffer_width;
-static u32 cached_framebuffer_height;
+static u32 cached_framebuffer_width = 0;
+static u32 cached_framebuffer_height = 0;
 
 VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
@@ -61,11 +61,11 @@ void upload_data_range(vulkan_context* context, VkCommandPool pool, VkFence fenc
 }
 
 b8 vulkan_renderer_backend_initialize(renderer_backend* backend, const char* application_name) {
-	
+    
     context.find_memory_index = find_memory_index;
     
     // TODO: Custom allocator
-	context.allocator = 0;
+    context.allocator = 0;
 
     application_get_framebuffer_size(&cached_framebuffer_width, &cached_framebuffer_height);
     context.framebuffer_width = (cached_framebuffer_width != 0) ? cached_framebuffer_width : 800;
@@ -73,37 +73,37 @@ b8 vulkan_renderer_backend_initialize(renderer_backend* backend, const char* app
     cached_framebuffer_height = 0;
     cached_framebuffer_width = 0;
 
-	// Setup Vulkan instance
-	VkApplicationInfo app_info = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
-	app_info.apiVersion = VK_API_VERSION_1_2;
-	app_info.pApplicationName = application_name;
-	app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	app_info.pEngineName = "First Engine";
-	app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    // Setup Vulkan instance
+    VkApplicationInfo app_info = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
+    app_info.apiVersion = VK_API_VERSION_1_2;
+    app_info.pApplicationName = application_name;
+    app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    app_info.pEngineName = "First Engine";
+    app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 
-	VkInstanceCreateInfo create_info = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
-	create_info.pApplicationInfo = &app_info;
+    VkInstanceCreateInfo create_info = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
+    create_info.pApplicationInfo = &app_info;
 
-	// Get required extensions
-	const char ** required_extensions = darray_create(const char*);
-	darray_push(required_extensions, &VK_KHR_SURFACE_EXTENSION_NAME); // General surface extension
-	platform_get_required_extension_names(&required_extensions);
+    // Get required extensions
+    const char ** required_extensions = darray_create(const char*);
+    darray_push(required_extensions, &VK_KHR_SURFACE_EXTENSION_NAME); // General surface extension
+    platform_get_required_extension_names(&required_extensions);
 #if defined(_DEBUG)
-	darray_push(required_extensions, &VK_EXT_DEBUG_UTILS_EXTENSION_NAME); // Debugging extension
+    darray_push(required_extensions, &VK_EXT_DEBUG_UTILS_EXTENSION_NAME); // Debugging extension
 
-	KDEBUG("Required extensions:");
-	u32 length = darray_length(required_extensions);
-	for (u32 i = 0; i < length; i++) {
-		KDEBUG("%s", required_extensions[i]);
-	}
+    KDEBUG("Required extensions:");
+    u32 length = darray_length(required_extensions);
+    for (u32 i = 0; i < length; i++) {
+        KDEBUG("%s", required_extensions[i]);
+    }
 #endif
 
-	create_info.enabledExtensionCount = darray_length(required_extensions);
+    create_info.enabledExtensionCount = darray_length(required_extensions);
     create_info.ppEnabledExtensionNames = required_extensions;
 
-	// Validation layers
-	const char ** required_validation_layer_names = 0;
-	u32 required_validation_layer_count = 0;
+    // Validation layers
+    const char ** required_validation_layer_names = 0;
+    u32 required_validation_layer_count = 0;
 
 #if defined(_DEBUG)
     KINFO("Validation layers enabled. Enumerating...");
@@ -142,10 +142,10 @@ b8 vulkan_renderer_backend_initialize(renderer_backend* backend, const char* app
     create_info.enabledLayerCount = required_validation_layer_count;
     create_info.ppEnabledLayerNames = required_validation_layer_names;
 
-	VK_CHECK(vkCreateInstance(&create_info, context.allocator, &context.instance));
-	KINFO("Vulkan instance created.");
+    VK_CHECK(vkCreateInstance(&create_info, context.allocator, &context.instance));
+    KINFO("Vulkan instance created.");
 
-	// Debugger
+    // Debugger
 #if defined(_DEBUG)
     KDEBUG("Creating Vulkan debugger...");
     u32 log_severity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
@@ -234,21 +234,36 @@ b8 vulkan_renderer_backend_initialize(renderer_backend* backend, const char* app
 
     verts[0].position.x = -0.5 * f;
     verts[0].position.y = -0.5 * f;
+    verts[0].texcoord.x = 0.0f;
+    verts[0].texcoord.y = 0.0f;
 
     verts[1].position.y = 0.5 * f;
     verts[1].position.x = 0.5 * f;
+    verts[1].texcoord.x = 1.0f;
+    verts[1].texcoord.y = 1.0f;
 
     verts[2].position.x = -0.5 * f;
     verts[2].position.y = 0.5 * f;
+    verts[2].texcoord.x = 0.0f;
+    verts[2].texcoord.y = 1.0f;
 
     verts[3].position.x = 0.5 * f;
     verts[3].position.y = -0.5 * f;
+    verts[3].texcoord.x = 1.0f;
+    verts[3].texcoord.y = 0.0f;
 
     const u32 index_count = 6;
     u32 indices[index_count] = {0, 1, 2, 0, 3, 1};
 
     upload_data_range(&context, context.device.graphics_command_pool, 0, context.device.graphics_queue, &context.object_vertex_buffer, 0, sizeof(vertex_3d) * vert_count, verts);
     upload_data_range(&context, context.device.graphics_command_pool, 0, context.device.graphics_queue, &context.object_index_buffer, 0, sizeof(u32) * index_count, indices);
+    
+    u32 object_id = 0;
+    if (!vulkan_object_shader_acquire_resources(&context, &context.object_shader, &object_id)) {
+        KERROR("Failed to acquire shader resources.");
+        return false;
+    }
+
     // TODO: end temp code
 
     KINFO("Vulkan renderer initialized successfully.");
@@ -305,10 +320,7 @@ void vulkan_renderer_backend_shutdown(renderer_backend* backend) {
 
     // Destroy framebuffers
     for (u32 i = 0; i < context.swapchain.image_count; ++i) {
-        if (context.swapchain.framebuffers[i].handle) {
-            vulkan_framebuffer_destroy(&context, &context.swapchain.framebuffers[i]);
-            context.swapchain.framebuffers[i].handle = 0;
-        }
+        vulkan_framebuffer_destroy(&context, &context.swapchain.framebuffers[i]);
     }
 
     vulkan_renderpass_destroy(&context, &context.main_renderpass);
@@ -323,7 +335,7 @@ void vulkan_renderer_backend_shutdown(renderer_backend* backend) {
         vkDestroySurfaceKHR(context.instance, context.surface, context.allocator);
         context.surface = 0;
     }
-	
+    
     KDEBUG("Destroying Vulkan debugger...");
     if (context.debug_messenger) {
         PFN_vkDestroyDebugUtilsMessengerEXT func =
@@ -346,12 +358,13 @@ void vulkan_renderer_backend_on_resized(renderer_backend* backend, u16 width, u1
 }
 
 b8 vulkan_renderer_backend_begin_frame(renderer_backend* backend, f32 delta_time) {
+    context.frame_delta_time = delta_time;
     vulkan_device* device = &context.device;
 
     //Check if reacreating swap chain and boot out
     if (context.recreating_swapchain) {
         VkResult result = vkDeviceWaitIdle(device->logical_device);
-        if (vulkan_result_is_success(result)) {
+        if (!vulkan_result_is_success(result)) {
             KERROR("Vulkan_renderer_backend_begin_frame VkDeviceWaitIdle (1) failed: '%s'", vulkan_result_string(result, true));
             return false;
         }
@@ -380,7 +393,7 @@ b8 vulkan_renderer_backend_begin_frame(renderer_backend* backend, f32 delta_time
     if (!vulkan_fence_wait(
             &context,
             &context.in_flight_fences[context.current_frame],
-            0xffffffffffffffff)) {
+            UINT64_MAX)) {
         KWARN("In-flight fence wait failed.");
         return false;
     }
@@ -389,7 +402,7 @@ b8 vulkan_renderer_backend_begin_frame(renderer_backend* backend, f32 delta_time
     if (!vulkan_swapchain_acquire_next_image_index(
             &context,
             &context.swapchain,
-            0xffffffffffffffff,
+            UINT64_MAX,
             context.image_available_semaphores[context.current_frame],
             0,
             &context.image_index)) {
@@ -439,7 +452,7 @@ void vulkan_renderer_update_global_state(mat4 projection, mat4 view, vec3 view_p
 
     // TODO: other ubo properties
 
-    vulkan_object_shader_update_global_state(&context, &context.object_shader);
+    vulkan_object_shader_update_global_state(&context, &context.object_shader, context.frame_delta_time);
 }
 b8 vulkan_renderer_backend_end_frame(renderer_backend* backend, f32 delta_time) {
     vulkan_command_buffer* command_buffer = &context.graphics_command_buffers[context.image_index];
@@ -454,7 +467,7 @@ b8 vulkan_renderer_backend_end_frame(renderer_backend* backend, f32 delta_time) 
         vulkan_fence_wait(
                 &context,
                 &context.in_flight_fences[context.current_frame],
-                0xffffffffffffffff);
+                UINT64_MAX);
     }
 
     // Mark the image as being in use by this frame
@@ -503,13 +516,13 @@ b8 vulkan_renderer_backend_end_frame(renderer_backend* backend, f32 delta_time) 
         context.queue_complete_semaphores[context.current_frame],
         context.image_index);
 
-	return true;
+    return true;
 }
 
-void vulkan_backend_update_object(mat4 model) {
+void vulkan_backend_update_object(geometry_render_data data) {
     vulkan_command_buffer* command_buffer = &context.graphics_command_buffers[context.image_index];
     
-    vulkan_object_shader_update_object(&context, &context.object_shader, model);
+    vulkan_object_shader_update_object(&context, &context.object_shader, data);
 
     // TODO: temporary test code
     vulkan_object_shader_use(&context, &context.object_shader);
@@ -590,11 +603,11 @@ void create_command_buffers(renderer_backend* backend) {
     KDEBUG("Vulkan command buffers created.");
 }
 
-void regenerate_framebuffers(renderer_backend *backend, vulkan_swapchain *swapchain, vulkan_renderpass *renderpass) {
+void regenerate_framebuffers(renderer_backend* backend, vulkan_swapchain* swapchain, vulkan_renderpass *renderpass) {
     for (u32 i = 0; i < swapchain->image_count; ++i) {
         // TODO: make this dynamix based on the currently configured attachments
         u32 attachment_count = 2;
-        VkImageView attachments[] = {swapchain->views[i], context.swapchain.depth_attachment.view};
+        VkImageView attachments[] = {swapchain->views[i], swapchain->depth_attachment.view};
 
         vulkan_framebuffer_create(
             &context,
@@ -717,7 +730,7 @@ void vulkan_renderer_create_texture(const char* name, b8 auto_release, i32 width
     out_texture->width = width;
     out_texture->height = height;
     out_texture->channel_count = channel_count;
-    out_texture->generation = 0;
+    out_texture->generation = INVALID_ID;
 
     // Internal data creation.
     // TODO: Use an allocator for this.
@@ -768,6 +781,8 @@ void vulkan_renderer_create_texture(const char* name, b8 auto_release, i32 width
     // Copy the data from the buffer.
     vulkan_image_copy_from_buffer(&context, &data->image, staging.handle, &temp_buffer);
 
+    
+
     // Transition from optimal for data reciept to shader-read-only optimal layout.
     vulkan_image_transition_layout(
         &context,
@@ -778,6 +793,8 @@ void vulkan_renderer_create_texture(const char* name, b8 auto_release, i32 width
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     vulkan_command_buffer_end_single_use(&context, pool, &temp_buffer, queue);
+
+    vulkan_buffer_destroy(&context, &staging);
 
     // Create a sampler for the texture
     VkSamplerCreateInfo sampler_info = {VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
@@ -799,7 +816,7 @@ void vulkan_renderer_create_texture(const char* name, b8 auto_release, i32 width
     sampler_info.maxLod = 0.0f;
 
     VkResult result = vkCreateSampler(context.device.logical_device, &sampler_info, context.allocator, &data->sampler);
-    if (!vulkan_result_is_success(VK_SUCCESS)) {
+    if (!vulkan_result_is_success(result)) {
         KERROR("Error creating texture sampler: %s", vulkan_result_string(result, true));
         return;
     }
@@ -809,6 +826,9 @@ void vulkan_renderer_create_texture(const char* name, b8 auto_release, i32 width
 }
 
 void vulkan_renderer_destroy_texture(struct texture* texture) {
+
+    vkDeviceWaitIdle(context.device.logical_device);
+
     vulkan_texture_data* data = (vulkan_texture_data*)texture->internal_data;
 
     vulkan_image_destroy(&context, &data->image);

@@ -410,6 +410,16 @@ b8 vulkan_renderer_backend_begin_frame(renderer_backend* backend, f32 delta_time
         return false;
     }
 
+    if (context.images_in_flight[context.image_index] != VK_NULL_HANDLE) {
+        if (!vulkan_fence_wait(
+                &context,
+                context.images_in_flight[context.image_index],
+                UINT64_MAX)) {
+            KWARN("Image in-flight fence wait failed.");
+            return false;
+        }
+    }
+
     vulkan_command_buffer* command_buffer = &context.graphics_command_buffers[context.image_index];
     vulkan_command_buffer_reset(command_buffer);
     vulkan_command_buffer_begin(command_buffer, false, false, false);

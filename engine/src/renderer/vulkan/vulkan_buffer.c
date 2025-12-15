@@ -40,6 +40,8 @@ b8 vulkan_buffer_create(
     allocate_info.allocationSize = requirements.size;
     allocate_info.memoryTypeIndex = (u32)out_buffer->memory_index;
 
+    KTRACE("Requesting %i bits of memory", requirements.size);
+
     // Allocate the memory.
     VkResult result = vkAllocateMemory(
         context->device.logical_device,

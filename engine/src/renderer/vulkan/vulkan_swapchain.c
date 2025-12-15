@@ -1,9 +1,18 @@
 #include "vulkan_swapchain.h"
 
 #include "core/logger.h"
+#include "core/kstring.h"
 #include "core/kmemory.h"
+#include "core/application.h"
+
+#include "renderer/vulkan/vulkan_utils.h"
 #include "vulkan_device.h"
 #include "vulkan_image.h"
+
+
+#include "math/math_types.h"
+
+#include "platform/platform.h"
 
 void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* swapchain);
 void destroy(vulkan_context* context, vulkan_swapchain* swapchain);
@@ -117,7 +126,7 @@ void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* sw
 		&context->device.swapchain_support);
 
 	// Swapchain extent
-	if (context->device.swapchain_support.capabilities.currentExtent.width != 0xffffffff ) {
+	if (context->device.swapchain_support.capabilities.currentExtent.width != UINT32_MAX ) {
         swapchain_extent = context->device.swapchain_support.capabilities.currentExtent;
     }
 
@@ -164,7 +173,17 @@ void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* sw
     swapchain_create_info.clipped = VK_TRUE;
     swapchain_create_info.oldSwapchain = 0;
 
-    VK_CHECK(vkCreateSwapchainKHR(context->device.logical_device, &swapchain_create_info, context->allocator, &swapchain->handle));
+    //VK_CHECK(vkCreateSwapchainKHR(context->device.logical_device, &swapchain_create_info, context->allocator, &swapchain->handle));
+
+	VkResult result = vkCreateSwapchainKHR(context->device.logical_device, &swapchain_create_info, context->allocator, &swapchain->handle);
+
+    if (!vulkan_result_is_success(result)) {
+
+        const char* result_str = vulkan_result_string(result, true);
+
+        KFATAL("Failed to create Vulkan swapchain with the error: '%s'.", result_str);
+
+    }
 
     // Start with a zero frame index.
     context->current_frame = 0;

@@ -131,6 +131,7 @@ typedef struct vulkan_pipeline {
 typedef struct vulkan_descriptor_state {
     // One per frame
     u32 generations[3];
+    u32 ids[3];
 } vulkan_descriptor_state;
 
 #define VULKAN_OBJECT_SHADER_DESCRIPTOR_COUNT 2
@@ -171,8 +172,6 @@ typedef struct vulkan_material_shader {
     // TODO: make dynamic
     vulkan_object_shader_object_state object_states[VULKAN_OBJECT_MAX_OBJECT_COUNT];
 
-    // Pointers to default textures.
-    texture* default_diffuse;
 
     vulkan_pipeline pipeline;
 
